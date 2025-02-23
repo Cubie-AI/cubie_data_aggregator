@@ -1,16 +1,17 @@
 import "dotenv/config";
 import express from "express";
 import { getDaoHoldings } from "./solana.js";
-import { getRecentTweets } from "./twitter.js";
+import { recentTweets, startTweetTimer } from "./twitter.js";
 
 const app = express();
 
+// start polling the Twitter API
+startTweetTimer();
+
+// mount our rag endpoints
 app.get("/", async (_req, res) => {
   const daoInfo = await getDaoHoldings();
 
-  const tweets = await getRecentTweets();
-
-  console.dir(tweets, { depth: null });
   const data = `
   Current DAO holdings: ${daoInfo.solanaBalance} SOL
   Token holdings: ${JSON.stringify(
@@ -18,8 +19,9 @@ app.get("/", async (_req, res) => {
   )}
 
   RECENT TWEETS BY YOUR CREATOR:
-  ${tweets.join("\n")}
+  ${recentTweets.join("\n")}
   `;
+
   res.status(200).json({ data });
 });
 
