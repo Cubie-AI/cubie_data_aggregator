@@ -9,26 +9,45 @@ export let recentTweets: string[] = [];
 async function getRecentTweets() {
   let result: string[] = [];
   try {
-    const tweets = await twitter.v2.userTimeline(SOCRATES_TWITTER_ID, {
+    const request = await twitter.v2.userTimeline(SOCRATES_TWITTER_ID, {
       expansions: ["referenced_tweets.id", "referenced_tweets.id.author_id"],
       "tweet.fields": ["referenced_tweets"],
       max_results: 50,
     });
-    result = tweets.data.data.map((tweet: TweetV2) => {
-      const referencesContext = tweet.referenced_tweets?.map(
-        (referencedTweet) => {
-          console.dir(referencedTweet);
-          return `
-          [REFERENCED TWEET]
-          ${JSON.stringify(referencedTweet, null, 2)}`;
-        }
+
+    const references = request.tweets.flatMap(
+      (tweet: TweetV2) =>
+        tweet.referenced_tweets?.map((referencedTweet) => referencedTweet.id) ||
+        []
+    );
+
+    const referencedTweets = await twitter.v2.tweets(references, {
+      expansions: ["author_id"],
+    });
+
+    const usersIds = [];
+    for (const tweet of referencedTweets.data) {
+      if (tweet.author_id) {
+        usersIds.push(tweet.author_id);
+      }
+    }
+
+    const users = await twitter.v2.users(usersIds);
+
+    result = request.tweets.map((reference) => {
+      const quote = referencedTweets.data.find(
+        (ref) => ref.id === reference.id
       );
+      const user = users.data.find((u) => u.id === quote?.author_id);
 
       return `
       [MAIN TWEET BODY]
-      ${tweet.text}
-      ${referencesContext}
-      ================================`;
+      Content: ${reference.text}
+      
+      [QUOTED TWEET]
+      Author: ${user?.username}
+      Content: ${quote?.text}
+      `;
     });
   } catch (error) {
     if (error instanceof Error) {
