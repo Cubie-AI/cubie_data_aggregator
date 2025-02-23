@@ -17,18 +17,16 @@ async function getRecentTweets() {
       const referencesContext = tweet.referenced_tweets?.map(
         (referencedTweet) => {
           console.dir(referencedTweet);
-          return `[REFERENCE TWEET]\n${JSON.stringify(
-            referencedTweet,
-            null,
-            2
-          )}`;
+          return `
+          [REFERENCED TWEET]
+          ${JSON.stringify(referencedTweet, null, 2)}`;
         }
       );
 
       return `
       [MAIN TWEET BODY]
-      
-      ${tweet.text}\n\n${referencesContext}
+      ${tweet.text}
+      ${referencesContext}
       ================================`;
     });
   } catch (error) {
