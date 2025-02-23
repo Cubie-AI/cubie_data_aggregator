@@ -9,8 +9,25 @@ export let recentTweets: string[] = [];
 async function getRecentTweets() {
   let result: string[] = [];
   try {
-    const tweets = await twitter.v2.userTimeline(SOCRATES_TWITTER_ID);
-    result = tweets.data.data.map((tweet: TweetV2) => tweet.text);
+    const tweets = await twitter.v2.userTimeline(SOCRATES_TWITTER_ID, {
+      expansions: ["referenced_tweets.id"],
+    });
+    result = tweets.data.data.map((tweet: TweetV2) => {
+      const referencesContext = tweet.referenced_tweets?.map(
+        (referencedTweet) => {
+          console.dir(referencedTweet);
+          return `[REFERENCE TWEET]\n${JSON.stringify(
+            referencedTweet,
+            null,
+            2
+          )}`;
+        }
+      );
+
+      return `[MAIN TWEET BODY]\n${tweet.text}\n\n${referencesContext}
+      
+      \n ================================`;
+    });
   } catch (error) {
     if (error instanceof Error) {
     }
