@@ -1,0 +1,37 @@
+{
+  "name": "cubie_data_aggregator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "pnpm run clean && tsc",
+    "start": "pnpm run build && node --import tsx dist/app.js",
+    "dev": "node --import tsx --watch -r ts-node/register src/app.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.4.1",
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.5",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "dependencies": {
+    "@solana/spl-token": "^0.4.12",
+    "@solana/web3.js": "^1.98.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "twitter-api-v2": "^1.20.1"
+  }
+}
