@@ -10,7 +10,8 @@ async function getRecentTweets() {
   let result: string[] = [];
   try {
     const tweets = await twitter.v2.userTimeline(SOCRATES_TWITTER_ID, {
-      expansions: ["referenced_tweets.id"],
+      expansions: ["referenced_tweets.id", "referenced_tweets.id.author_id"],
+      "tweet.fields": ["referenced_tweets"],
       max_results: 50,
     });
     result = tweets.data.data.map((tweet: TweetV2) => {
