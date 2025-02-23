@@ -11,6 +11,7 @@ async function getRecentTweets() {
   try {
     const tweets = await twitter.v2.userTimeline(SOCRATES_TWITTER_ID, {
       expansions: ["referenced_tweets.id"],
+      max_results: 50,
     });
     result = tweets.data.data.map((tweet: TweetV2) => {
       const referencesContext = tweet.referenced_tweets?.map(
@@ -24,9 +25,11 @@ async function getRecentTweets() {
         }
       );
 
-      return `[MAIN TWEET BODY]\n${tweet.text}\n\n${referencesContext}
+      return `
+      [MAIN TWEET BODY]
       
-      \n ================================`;
+      ${tweet.text}\n\n${referencesContext}
+      ================================`;
     });
   } catch (error) {
     if (error instanceof Error) {
