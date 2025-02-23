@@ -1,7 +1,8 @@
 import "dotenv/config";
 import express from "express";
-import { getDaoHoldings } from "./solana.js";
-import { recentTweets, startTweetTimer } from "./twitter.js";
+import { getTokenomicsDoc } from "./external/github.js";
+import { getDaoHoldings } from "./external/solana.js";
+import { recentTweets, startTweetTimer } from "./external/twitter.js";
 
 const app = express();
 
@@ -20,8 +21,12 @@ app.get("/", async (_req, res) => {
 
   RECENT TWEETS BY YOUR CREATOR:
   ${recentTweets.join("\n")}
+
+  MOST RECENT TOKENOMICS DOC:
+  ${await getTokenomicsDoc()}
   `;
 
+  console.log("Created aggregate data: ", data);
   res.status(200).json({ data });
 });
 
